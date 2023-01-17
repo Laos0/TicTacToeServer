@@ -35,15 +35,22 @@ io.on("connection", (socket) => {
         // check whos turn it is
         if(currentPlayer == player){
             // if it is the correct player's turn proceed to insert into board game
-            console.log(player + ' selected ' + row + ', ' + col);
+            //console.log(player + ' selected ' + row + ', ' + col);
 
             boardGame.insertIntoBoard(player, row, col);
+            console.log(boardGame.printBoard());
 
-            // change to next player
-            if(currentPlayer == 'X'){
-                currentPlayer = 'O';
+            //console.log('Was selection successful? ' + boardGame.getIsSucessfulSelect());
+            // if the selection was successful
+            if(boardGame.getIsSucessfulSelect()){
+                // change to next player
+                if(currentPlayer == 'X'){
+                    currentPlayer = 'O';
+                }else{
+                    currentPlayer = 'X';
+                }
             }else{
-                currentPlayer = 'X';
+                console.log('it is still ' + player + ' turn');
             }
         }
     });
@@ -58,6 +65,3 @@ io.on("connection", (socket) => {
 })
 
 io.listen(port);
-// server.listen(port, () => {
-//     console.log("Server is running on *port: " + port);
-// });

@@ -8,16 +8,21 @@ let gameBoard = [
 
 let winner = '';
 let isGameOver = false;
-isGameOver = true;
+let isSuccessfulSelect = true;
 
 // we pass in the user's role the selected row and column
 function insertIntoBoard(userRole, row, col){
+    console.log("INSERT " + userRole)
     if(gameBoard[row][col] == ''){
-        gameBoard[row][col] == userRole;
+        gameBoard[row][col] = userRole;
+        successfulSelection();
+
+    }else{
+        failSelection();
     }
 
     //TODO: Check if there is a winner after insertion
-    checkWinner(userRole);
+    //checkWinner(userRole);
 }
 
 function checkWinner(userRole) {
@@ -50,6 +55,22 @@ function checkWinner(userRole) {
     }
 }
 
+function printBoard(){
+    console.log(gameBoard);
+}
+
+function successfulSelection(){
+    isSuccessfulSelect = true;
+}
+
+function failSelection(){
+    isSuccessfulSelect = false;
+}
+
+function getIsSucessfulSelect(){
+    return isSuccessfulSelect;
+}
+
 // TODO: Check for Tie game
 
-module.exports = [insertIntoBoard];
+module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect};

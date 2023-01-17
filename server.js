@@ -43,15 +43,21 @@ io.on("connection", (socket) => {
             //console.log('Was selection successful? ' + boardGame.getIsSucessfulSelect());
             // if the selection was successful
             if(boardGame.getIsSucessfulSelect()){
-                // change to next player
-                if(currentPlayer == 'X'){
-                    currentPlayer = 'O';
-                }else{
-                    currentPlayer = 'X';
+
+                // proceed to switch players only if game is not over
+                if(!boardGame.getIsGameOver()){
+
+                    // change to next player
+                    if(currentPlayer == 'X'){
+                        currentPlayer = 'O';
+                    }else{
+                        currentPlayer = 'X';
+                    }
                 }
             }else{
                 console.log('it is still ' + player + ' turn');
             }
+
         }
     });
 

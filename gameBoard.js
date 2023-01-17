@@ -1,5 +1,5 @@
-// 
 
+// our game board in which we will continue to update as user select the tiles
 let gameBoard = [
     ['', '', ''],
     ['', '', ''],
@@ -12,17 +12,26 @@ let isSuccessfulSelect = true;
 
 // we pass in the user's role the selected row and column
 function insertIntoBoard(userRole, row, col){
-    console.log("INSERT " + userRole)
-    if(gameBoard[row][col] == ''){
-        gameBoard[row][col] = userRole;
-        successfulSelection();
+    //console.log("INSERT " + userRole)
 
-    }else{
-        failSelection();
+    // can only play the game when the game is not over
+    if(!isGameOver){
+
+        if(gameBoard[row][col] == ''){
+            gameBoard[row][col] = userRole;
+            successfulSelection();
+    
+            checkWinner(userRole);
+            if(isGameOver){
+                console.log(userRole + ' wins!');
+            }
+    
+        }else{
+            failSelection();
+        }
     }
 
-    //TODO: Check if there is a winner after insertion
-    //checkWinner(userRole);
+    
 }
 
 function checkWinner(userRole) {
@@ -30,7 +39,7 @@ function checkWinner(userRole) {
     if(gameBoard[0][0] == userRole && gameBoard[0][1] == userRole && gameBoard[0][2] == userRole)
     {
         winner = userRole;
-        isGameOver = true;
+        gameOver();
     }else if(gameBoard[1][0] == userRole && gameBoard[1][1] == userRole && gameBoard[1][2] == userRole){
         winner = userRole;
         isGameOver = true;
@@ -71,6 +80,14 @@ function getIsSucessfulSelect(){
     return isSuccessfulSelect;
 }
 
+function gameOver(){
+    isGameOver = true;
+}
+
+function getIsGameOver(){
+    return isGameOver;
+}
+
 // TODO: Check for Tie game
 
-module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect};
+module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver};

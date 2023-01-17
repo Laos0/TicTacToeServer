@@ -11,6 +11,7 @@ const io = require('socket.io')(server, {
 
 
 const playerRole = require('./playerRole')
+let boardGame = require('./gameBoard');
 
 // hashmap to keep track of the role of the player
 let playersHashMap = new Map();
@@ -26,6 +27,7 @@ io.on("connection", (socket) => {
 
     // 2: Store the user's detail in playersHashMap
     playersHashMap.set(socket.id, role);
+
 
 
 

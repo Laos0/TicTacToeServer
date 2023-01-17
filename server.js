@@ -16,6 +16,8 @@ let boardGame = require('./gameBoard');
 // hashmap to keep track of the role of the player
 let playersHashMap = new Map();
 
+let currentPlayer = 'X';
+
 // when a user connects to socket on client side, this will trigger
 io.on("connection", (socket) => {
     console.log('User: ' + socket.id + ' connected');
@@ -28,8 +30,23 @@ io.on("connection", (socket) => {
     // 2: Store the user's detail in playersHashMap
     playersHashMap.set(socket.id, role);
 
+    // 3: Listen to player's selected
+    socket.on('selectedTile', (player, row, col) => {
+        // check whos turn it is
+        if(currentPlayer == player){
+            // if it is the correct player's turn proceed to insert into board game
+            console.log(player + ' selected ' + row + ', ' + col);
 
+            boardGame.insertIntoBoard(player, row, col);
 
+            // change to next player
+            if(currentPlayer == 'X'){
+                currentPlayer = 'O';
+            }else{
+                currentPlayer = 'X';
+            }
+        }
+    });
 
     // when a user disconnects from socket, this will trigger
     socket.on('disconnect', (socket) => {

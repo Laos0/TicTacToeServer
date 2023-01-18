@@ -40,9 +40,15 @@ io.on("connection", (socket) => {
             boardGame.insertIntoBoard(player, row, col);
             console.log(boardGame.printBoard());
 
+        
             //console.log('Was selection successful? ' + boardGame.getIsSucessfulSelect());
             // if the selection was successful
             if(boardGame.getIsSucessfulSelect()){
+
+
+                // if insertion was successful we have to emit it back to the client side
+                // to be seen visually
+                io.emit('insertionSuccessful', player, boardGame.getGameBoard());
 
                 // proceed to switch players only if game is not over
                 if(!boardGame.getIsGameOver()){

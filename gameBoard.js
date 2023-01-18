@@ -88,6 +88,10 @@ function getIsGameOver(){
     return isGameOver;
 }
 
+function getGameBoard(){
+    return gameBoard;
+}
+
 // TODO: Check for Tie game
 
-module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver};
+module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard};

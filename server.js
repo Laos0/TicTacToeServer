@@ -59,7 +59,10 @@ io.on("connection", (socket) => {
                     }else{
                         currentPlayer = 'X';
                     }
+                }else{ // if the game is over and a winner is declared
+                    io.emit('gameOver', {message: 'The game is over', isGameOver: boardGame.getIsGameOver(), winner: boardGame.getWinner()});
                 }
+
             }else{
                 console.log('it is still ' + player + ' turn');
             }

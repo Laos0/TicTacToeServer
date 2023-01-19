@@ -24,6 +24,7 @@ function insertIntoBoard(userRole, row, col){
             checkWinner(userRole);
             if(isGameOver){
                 console.log(userRole + ' wins!');
+                setWinner(userRole);
             }
     
         }else{
@@ -38,29 +39,35 @@ function checkWinner(userRole) {
 
     if(gameBoard[0][0] == userRole && gameBoard[0][1] == userRole && gameBoard[0][2] == userRole)
     {
-        winner = userRole;
+        setWinner(userRole);
         gameOver();
     }else if(gameBoard[1][0] == userRole && gameBoard[1][1] == userRole && gameBoard[1][2] == userRole){
-        winner = userRole;
+        setWinner(userRole);
         isGameOver = true;
     }else if(gameBoard[2][0] == userRole && gameBoard[2][1] == userRole && gameBoard[2][2] == userRole){
-        winner = userRole;
+        setWinner(userRole);
         isGameOver = true;
     }else if(gameBoard[0][0] == userRole && gameBoard[1][0] == userRole && gameBoard[2][0] == userRole){
-        winner = userRole;
+        setWinner(userRole);
         isGameOver = true;
     }else if(gameBoard[0][1] == userRole && gameBoard[1][1] == userRole && gameBoard[2][1] == userRole){
-        winner = userRole;
+        setWinner(userRole);
         isGameOver = true;
     }else if(gameBoard[0][2] == userRole && gameBoard[1][2] == userRole && gameBoard[2][2] == userRole){
-        winner = userRole;
+        setWinner(userRole);
         isGameOver = true;
     }else if(gameBoard[0][0] == userRole && gameBoard[1][1] == userRole && gameBoard[2][2] == userRole){
-        winner = userRole;
+        setWinner(userRole);
         isGameOver = true;
     }else if(gameBoard[0][2] == userRole && gameBoard[1][1] == userRole && gameBoard[2][0] == userRole){
-        winner = userRole;
+        setWinner(userRole);
         isGameOver = true;
+    }else{
+        
+        //TODO: Logics for checking for a tie
+        // Loop through the boardGame and make sure each on isnt === ''
+        //setWinner('TIE');
+        //isGameOver = true;
     }
 }
 
@@ -92,6 +99,14 @@ function getGameBoard(){
     return gameBoard;
 }
 
+function setWinner(player){
+    winner = player;
+}
+
+function getWinner(){
+    return winner;
+}
+
 // TODO: Check for Tie game
 
-module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard};
+module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard, getWinner};

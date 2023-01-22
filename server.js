@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
@@ -61,12 +61,25 @@ io.on("connection", (socket) => {
                     }
                 }else{ // if the game is over and a winner is declared
                     io.emit('gameOver', {message: 'The game is over', isGameOver: boardGame.getIsGameOver(), winner: boardGame.getWinner()});
+            
+                    console.log("THE WINNER IS: " + boardGame.getWinner());
                 }
 
             }else{
                 console.log('it is still ' + player + ' turn');
             }
 
+        }
+
+    });
+
+    // TODO: once the game is over we will listen to a restart button on client side to reset the board game
+    socket.on('restart', (data) => {
+        if(data){
+            console.log('Game is restarting...');
+
+            // TODO: Need to reset nodejs server OR reset the board game, reset boardGame.resetGameOver()
+            // TODO: emit to client once everything has been resetted so client side knows when to refresh webpage
         }
     });
 
@@ -77,6 +90,6 @@ io.on("connection", (socket) => {
         playerRole.returnRole(role);
     })
 
-})
+});
 
 io.listen(port);

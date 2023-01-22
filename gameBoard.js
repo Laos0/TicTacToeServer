@@ -9,6 +9,8 @@ let gameBoard = [
 let winner = '';
 let isGameOver = false;
 let isSuccessfulSelect = true;
+let isTie = false;
+let isBoardFilled = false;
 
 // we pass in the user's role the selected row and column
 function insertIntoBoard(userRole, row, col){
@@ -22,9 +24,11 @@ function insertIntoBoard(userRole, row, col){
             successfulSelection();
     
             checkWinner(userRole);
-            if(isGameOver){
-                console.log(userRole + ' wins!');
-                setWinner(userRole);
+            if(isGameOver && isBoardFilled){
+                // if the game is over and the board is filled
+                setWinner('TIE');
+            }else{
+                setWinner(userRole)
             }
     
         }else{
@@ -64,10 +68,22 @@ function checkWinner(userRole) {
         isGameOver = true;
     }else{
         
-        //TODO: Logics for checking for a tie
-        // Loop through the boardGame and make sure each on isnt === ''
-        //setWinner('TIE');
-        //isGameOver = true;
+        // checking if all the elements in the gameBoard is not equal to '' 
+        // if no elements equals to '' then the board is filled
+        setIsBoardFilled(gameBoard.every(function(subArray) {
+            return subArray.every(function(element) {
+                return element !== '';
+            });
+        }));
+
+        
+
+        // checking if the board is filled
+        if(isBoardFilled){
+            // if the board is filled we need to trigger isGameOver
+            isGameOver = true;
+            console.log("TIE GAME!");
+        }
     }
 }
 
@@ -107,6 +123,18 @@ function getWinner(){
     return winner;
 }
 
+function resetGameOver(){
+    isGameOver = false;
+}
+
+function setIsTie(trueOrFalse){
+    isTie = trueOrFalse;
+}
+
+function setIsBoardFilled(trueOrFalse){
+    isBoardFilled = trueOrFalse;
+}
+
 // TODO: Check for Tie game
 
-module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard, getWinner};
+module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard, getWinner, resetGameOver};

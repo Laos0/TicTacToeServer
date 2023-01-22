@@ -6,6 +6,8 @@ let gameBoard = [
     ['', '', '']
 ]
 
+let winningTiles = [];
+
 let winner = '';
 let isGameOver = false;
 let isSuccessfulSelect = true;
@@ -44,6 +46,7 @@ function checkWinner(userRole) {
     if(gameBoard[0][0] == userRole && gameBoard[0][1] == userRole && gameBoard[0][2] == userRole)
     {
         setWinner(userRole);
+        setWinningTiles(0,0,0,1,0,2);
         gameOver();
     }else if(gameBoard[1][0] == userRole && gameBoard[1][1] == userRole && gameBoard[1][2] == userRole){
         setWinner(userRole);
@@ -135,6 +138,20 @@ function setIsBoardFilled(trueOrFalse){
     isBoardFilled = trueOrFalse;
 }
 
+// boardGame[a][b], boardGame[c][d], boardGame[e][f]
+function setWinningTiles(a,b,c,d,e,f){
+    winningTiles.push(a);
+    winningTiles.push(b);
+    winningTiles.push(c);
+    winningTiles.push(d);
+    winningTiles.push(e);
+    winningTiles.push(f);
+}
+
+function getWinningTiles(){
+    return winningTiles;
+}
+
 // TODO: Check for Tie game
 
-module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard, getWinner, resetGameOver};
+module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard, getWinner, resetGameOver, getWinningTiles};

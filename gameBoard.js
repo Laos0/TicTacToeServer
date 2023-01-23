@@ -50,24 +50,31 @@ function checkWinner(userRole) {
         gameOver();
     }else if(gameBoard[1][0] == userRole && gameBoard[1][1] == userRole && gameBoard[1][2] == userRole){
         setWinner(userRole);
+        setWinningTiles(1,0,1,1,1,2);
         isGameOver = true;
     }else if(gameBoard[2][0] == userRole && gameBoard[2][1] == userRole && gameBoard[2][2] == userRole){
         setWinner(userRole);
+        setWinningTiles(2,0,2,1,2,2);
         isGameOver = true;
     }else if(gameBoard[0][0] == userRole && gameBoard[1][0] == userRole && gameBoard[2][0] == userRole){
         setWinner(userRole);
+        setWinningTiles(0,0,1,0,2,0);
         isGameOver = true;
     }else if(gameBoard[0][1] == userRole && gameBoard[1][1] == userRole && gameBoard[2][1] == userRole){
         setWinner(userRole);
+        setWinningTiles(0,1,1,1,2,1);
         isGameOver = true;
     }else if(gameBoard[0][2] == userRole && gameBoard[1][2] == userRole && gameBoard[2][2] == userRole){
         setWinner(userRole);
+        setWinningTiles(0,2,1,2,2,2);
         isGameOver = true;
     }else if(gameBoard[0][0] == userRole && gameBoard[1][1] == userRole && gameBoard[2][2] == userRole){
         setWinner(userRole);
+        setWinningTiles(0,0,1,1,2,2);
         isGameOver = true;
     }else if(gameBoard[0][2] == userRole && gameBoard[1][1] == userRole && gameBoard[2][0] == userRole){
         setWinner(userRole);
+        setWinningTiles(0,2,1,1,2,0);
         isGameOver = true;
     }else{
         

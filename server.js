@@ -61,6 +61,7 @@ io.on("connection", (socket) => {
                     }
                 }else{ // if the game is over and a winner is declared
                     io.emit('gameOver', {message: 'The game is over', isGameOver: boardGame.getIsGameOver(), winner: boardGame.getWinner(), winTiles: boardGame.getWinningTiles()});
+                    console.log("The winning tiles: " + boardGame.getWinningTiles());
             
                     console.log("THE WINNER IS: " + boardGame.getWinner());
                 }

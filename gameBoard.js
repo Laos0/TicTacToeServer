@@ -159,6 +159,18 @@ function getWinningTiles(){
     return winningTiles;
 }
 
+function clearBoard(){
+    for (let i = 0; i < gameBoard.length; i++) {
+        for (let j = 0; j < gameBoard[i].length; j++) {
+          gameBoard[i][j] = "";
+        }
+      }
+
+    console.log("The game board after clear: ",gameBoard);
+}
+
 // TODO: Check for Tie game
 
-module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, getIsGameOver, getGameBoard, getWinner, resetGameOver, getWinningTiles};
+module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, 
+    getIsGameOver, getGameBoard, getWinner, 
+    resetGameOver, getWinningTiles, clearBoard};

@@ -12,6 +12,7 @@ const io = require('socket.io')(server, {
 
 const playerRole = require('./playerRole')
 let boardGame = require('./gameBoard');
+let score = require('./score');
 
 // hashmap to keep track of the role of the player
 let playersHashMap = new Map();
@@ -60,7 +61,19 @@ io.on("connection", (socket) => {
                         currentPlayer = 'X';
                     }
                 }else{ // if the game is over and a winner is declared
-                    io.emit('gameOver', {message: 'The game is over', isGameOver: boardGame.getIsGameOver(), winner: boardGame.getWinner(), winTiles: boardGame.getWinningTiles()});
+
+                    // change to next player
+                    if(currentPlayer == 'X'){
+                        currentPlayer = 'O';
+                    }else{
+                        currentPlayer = 'X';
+                    }
+
+                    // increment score for the winner or do nothing if there is atie
+                    score.incrementScore(boardGame.getWinner());
+
+                    io.emit('gameOver', {message: 'The game is over', isGameOver: boardGame.getIsGameOver(), winner: boardGame.getWinner(), winTiles: boardGame.getWinningTiles(), curPlayer: currentPlayer, playerXScore: score.getXScore(), playerOScore: score.getOScore()});
+
                     console.log("The winning tiles: " + boardGame.getWinningTiles());
             
                     console.log("THE WINNER IS: " + boardGame.getWinner());
@@ -80,7 +93,13 @@ io.on("connection", (socket) => {
             console.log('Game is restarting...');
 
             // TODO: Need to reset nodejs server OR reset the board game, reset boardGame.resetGameOver()
+            boardGame.resetGameOver();
+            boardGame.clearBoard();
+            console.log("The current player after restarting is: ", currentPlayer);
+            console.log('The boolean for gameOver is: ' + boardGame.getIsGameOver());
+            console.log(boardGame.getGameBoard());
             // TODO: emit to client once everything has been resetted so client side knows when to refresh webpage
+            io.emit('restartComplete', {gameBoard: boardGame.getGameBoard()});
         }
     });
 

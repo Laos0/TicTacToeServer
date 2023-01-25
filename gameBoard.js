@@ -159,6 +159,10 @@ function getWinningTiles(){
     return winningTiles;
 }
 
+function clearWinTiles(){
+    winningTiles = [];
+}
+
 function clearBoard(){
     for (let i = 0; i < gameBoard.length; i++) {
         for (let j = 0; j < gameBoard[i].length; j++) {
@@ -173,4 +177,4 @@ function clearBoard(){
 
 module.exports = {insertIntoBoard, printBoard, getIsSucessfulSelect, 
     getIsGameOver, getGameBoard, getWinner, 
-    resetGameOver, getWinningTiles, clearBoard};
+    resetGameOver, getWinningTiles, clearBoard, clearWinTiles};

@@ -95,6 +95,7 @@ io.on("connection", (socket) => {
             // TODO: Need to reset nodejs server OR reset the board game, reset boardGame.resetGameOver()
             boardGame.resetGameOver();
             boardGame.clearBoard();
+            boardGame.clearWinTiles();
             console.log("The current player after restarting is: ", currentPlayer);
             console.log('The boolean for gameOver is: ' + boardGame.getIsGameOver());
             console.log(boardGame.getGameBoard());

@@ -17,6 +17,9 @@ let score = require('./score');
 // hashmap to keep track of the role of the player
 let playersHashMap = new Map();
 
+// hashmap to keep track of player's flashing letter
+let playersAnimation = new Map();
+
 let currentPlayer = 'X';
 
 // when a user connects to socket on client side, this will trigger
@@ -31,8 +34,8 @@ io.on("connection", (socket) => {
     // 2: Store the user's detail in playersHashMap
     playersHashMap.set(socket.id, role);
 
-    // 3: Listen to player's selected
-    socket.on('selectedTile', (player, row, col) => {
+    // 3: Listen to player's selected tiles
+    socket.on('selectedTile', (player, row, col, isAnimating) => {
         // check whos turn it is
         if(currentPlayer == player){
             // if it is the correct player's turn proceed to insert into board game
@@ -50,6 +53,9 @@ io.on("connection", (socket) => {
                 // if insertion was successful we have to emit it back to the client side
                 // to be seen visually
                 io.emit('insertionSuccessful', player, boardGame.getGameBoard());
+                
+                socket.emit('animationOff', false); // turn off animation of whoever just selected a tile
+                
 
                 // proceed to switch players only if game is not over
                 if(!boardGame.getIsGameOver()){
@@ -57,16 +63,20 @@ io.on("connection", (socket) => {
                     // change to next player
                     if(currentPlayer == 'X'){
                         currentPlayer = 'O';
+                        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
                     }else{
                         currentPlayer = 'X';
+                        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
                     }
                 }else{ // if the game is over and a winner is declared
 
                     // change to next player
                     if(currentPlayer == 'X'){
                         currentPlayer = 'O';
+                        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
                     }else{
                         currentPlayer = 'X';
+                        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
                     }
 
                     // increment score for the winner or do nothing if there is atie
@@ -100,7 +110,7 @@ io.on("connection", (socket) => {
             console.log('The boolean for gameOver is: ' + boardGame.getIsGameOver());
             console.log(boardGame.getGameBoard());
             // TODO: emit to client once everything has been resetted so client side knows when to refresh webpage
-            io.emit('restartComplete', {gameBoard: boardGame.getGameBoard()});
+            io.emit('restartComplete', {gameBoard: boardGame.getGameBoard(), curPlayer: currentPlayer});
         }
     });
 

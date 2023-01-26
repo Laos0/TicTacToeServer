@@ -2,13 +2,12 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-const port = 8080;
+const { port = 3000 } = process.env;
 const io = require('socket.io')(server, {
     cors: {
         origin: ['http://localhost:4200'],
     },
 });
-
 
 const playerRole = require('./playerRole')
 let boardGame = require('./gameBoard');
@@ -21,6 +20,10 @@ let playersHashMap = new Map();
 let playersAnimation = new Map();
 
 let currentPlayer = 'X';
+
+app.get('/', (req,res) => {
+    res.send("Hello, World");
+});
 
 // when a user connects to socket on client side, this will trigger
 io.on("connection", (socket) => {
@@ -123,4 +126,5 @@ io.on("connection", (socket) => {
 
 });
 
-io.listen(port);
+io.listen(port); // port 3000
+server.listen(8080); // port 8080

@@ -6,8 +6,12 @@ const { port = 3000 } = process.env;
 const io = require('socket.io')(server, {
     cors: {
         origin: ['http://localhost:4200'],
+        origin: ['http://localhost:4200']
     },
 });
+const cors = require('cors');
+
+app.use(cors());
 
 const playerRole = require('./playerRole')
 let boardGame = require('./gameBoard');
@@ -21,8 +25,9 @@ let playersAnimation = new Map();
 
 let currentPlayer = 'X';
 
+
 app.get('/', (req,res) => {
-    res.send("Hello, World");
+    res.json({message: 'Server is running...', serverStatus: 'running'});
 });
 
 // when a user connects to socket on client side, this will trigger

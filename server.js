@@ -5,7 +5,6 @@ const server = http.createServer(app);
 const { port = 3000 } = process.env;
 const io = require('socket.io')(server, {
     cors: {
-        origin: ['http://localhost:4200'],
         origin: ['http://localhost:4200']
     },
 });
@@ -16,6 +15,7 @@ app.use(cors());
 const playerRole = require('./playerRole')
 let boardGame = require('./gameBoard');
 let score = require('./score');
+const { Socket } = require('socket.io');
 
 // hashmap to keep track of the role of the player
 let playersHashMap = new Map();
@@ -24,17 +24,40 @@ let playersHashMap = new Map();
 let playersAnimation = new Map();
 
 let currentPlayer = 'X';
+let numOfClients = 0;
+let maxCapacity = 4; // a total of only 4 clients
 
 
 app.get('/', (req,res) => {
     res.json({message: 'Server is running...', serverStatus: 'running'});
 });
 
+app.get('/clients', (req, res) => {
+    res.send("There are " + numOfClients + " connected to the server");
+});
+
+console.log("BEFORE IF STATEMENT: " + numOfClients);
+
 // when a user connects to socket on client side, this will trigger
 io.on("connection", (socket) => {
+    numOfClients++;
+
+
     console.log('User: ' + socket.id + ' connected');
+    console.log(" The number of clients connected: " + numOfClients);
+
+    // Send the current number of clients to client-side
+    socket.emit('getClientCount', numOfClients);
+
+    // TODO: If max capacity, send the total clients out to client-side
+    if(numOfClients > maxCapacity){
+        socket.emit('maxCapacity', {totalClients: numOfClients});
+    }
 
     let role = playerRole.assignRole();
+
+    // get the updated board for spectators when they join
+    socket.emit('updatedBoard', {boardGame: boardGame.getGameBoard()});
 
     // 1: Assign player's role
     socket.emit('userRole', role);
@@ -127,9 +150,13 @@ io.on("connection", (socket) => {
         
         // 1: When user disconnects, we need to put their role back into our array
         playerRole.returnRole(role);
+
+        // when a user disconnects we subtract
+        numOfClients--;
     })
 
 });
+
 
 io.listen(port); // port 3000
 server.listen(8080); // port 8080

@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
     let role = playerRole.assignRole();
 
     // get the updated board for spectators when they join
-    socket.emit('updatedBoard', {boardGame: boardGame.getGameBoard()});
+    socket.emit('updatedBoard', {boardGame: boardGame.getGameBoard(), xScore: score.getXScore(), oScore: score.getOScore()});
 
     // 1: Assign player's role
     socket.emit('userRole', role);

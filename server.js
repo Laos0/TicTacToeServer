@@ -45,6 +45,7 @@ console.log("BEFORE IF STATEMENT: " + numOfClients);
 
 // when a user connects to socket on client side, this will trigger
 io.on("connection", (socket) => {
+    // increase the number of clients on the server
     numOfClients++;
 
 
@@ -60,16 +61,15 @@ io.on("connection", (socket) => {
         socket.emit('maxCapacity', {totalClients: numOfClients});
     }
 
+    // assigning the role to the player connected
     let role = playerRole.assignRole();
     console.log('role: ' + role)
 
     // get the updated board for spectators when they join
     socket.emit('updatedBoard', {boardGame: boardGame.getGameBoard(), xScore: score.getXScore(), oScore: score.getOScore()});
 
-    // TODO:
     // emit an available role such as X or O to all clients
     // this is needed to assign role to new clients when player X or O disconnects
-    
     if(!playerRole.isEmpty()){
         io.emit('getAvailableRole', {playerRole: playerRole.availableRole});
     }else{
@@ -171,6 +171,8 @@ io.on("connection", (socket) => {
 
         // when a user disconnects we subtract
         numOfClients--;
+
+        console.log(applyColor.yellow, " the available roles after disconnect: ", playerRole.availableRole());
 
     });
 

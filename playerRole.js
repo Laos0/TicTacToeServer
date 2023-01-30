@@ -11,7 +11,10 @@ function assignRole() {
 }
 
 function returnRole(userRole){
-    playerRole.push(userRole);
+    // if the userRole is not undefined, then push it in
+    if(userRole){
+        playerRole.push(userRole);
+    }
 }
 
 function availableRole() {

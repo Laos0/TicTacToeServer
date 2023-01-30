@@ -17,6 +17,7 @@ let boardGame = require('./gameBoard');
 let score = require('./score');
 const { Socket } = require('socket.io');
 
+
 // hashmap to keep track of the role of the player
 let playersHashMap = new Map();
 
@@ -28,10 +29,13 @@ let numOfClients = 0;
 let maxCapacity = 4; // a total of only 4 clients
 
 
+
+// get request to show that the server is running
 app.get('/', (req,res) => {
     res.json({message: 'Server is running...', serverStatus: 'running'});
 });
 
+// get request to show the number of clients connected to socket
 app.get('/clients', (req, res) => {
     res.send("There are " + numOfClients + " connected to the server");
 });
@@ -43,21 +47,33 @@ io.on("connection", (socket) => {
     numOfClients++;
 
 
+    // testing purposes
     console.log('User: ' + socket.id + ' connected');
     console.log(" The number of clients connected: " + numOfClients);
 
     // Send the current number of clients to client-side
     socket.emit('getClientCount', numOfClients);
 
-    // TODO: If max capacity, send the total clients out to client-side
+    // If max capacity, send the total clients out to client-side
     if(numOfClients > maxCapacity){
         socket.emit('maxCapacity', {totalClients: numOfClients});
     }
 
     let role = playerRole.assignRole();
+    console.log('role: ' + role)
 
     // get the updated board for spectators when they join
     socket.emit('updatedBoard', {boardGame: boardGame.getGameBoard(), xScore: score.getXScore(), oScore: score.getOScore()});
+
+    // TODO:
+    // emit an available role such as X or O to all clients
+    // this is needed to assign role to new clients when player X or O disconnects
+    
+    if(!playerRole.isEmpty()){
+        io.emit('getAvailableRole', {playerRole: playerRole.availableRole});
+    }else{
+        console.log('Role is undefined ' + playerRole.availableRole());
+    }
 
     // 1: Assign player's role
     socket.emit('userRole', role);
@@ -128,19 +144,19 @@ io.on("connection", (socket) => {
 
     });
 
-    // TODO: once the game is over we will listen to a restart button on client side to reset the board game
+    // once the game is over we will listen to a restart button on client side to reset the board game
     socket.on('restart', (data) => {
         if(data){
             console.log('Game is restarting...');
 
-            // TODO: Need to reset nodejs server OR reset the board game, reset boardGame.resetGameOver()
+            // Need to reset nodejs server OR reset the board game, reset boardGame.resetGameOver()
             boardGame.resetGameOver();
             boardGame.clearBoard();
             boardGame.clearWinTiles();
             console.log("The current player after restarting is: ", currentPlayer);
             console.log('The boolean for gameOver is: ' + boardGame.getIsGameOver());
             console.log(boardGame.getGameBoard());
-            // TODO: emit to client once everything has been resetted so client side knows when to refresh webpage
+            // emit to client once everything has been resetted so client side knows when to refresh webpage
             io.emit('restartComplete', {gameBoard: boardGame.getGameBoard(), curPlayer: currentPlayer});
         }
     });
@@ -153,7 +169,8 @@ io.on("connection", (socket) => {
 
         // when a user disconnects we subtract
         numOfClients--;
-    })
+
+    });
 
 });
 

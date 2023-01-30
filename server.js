@@ -16,6 +16,7 @@ const playerRole = require('./playerRole')
 let boardGame = require('./gameBoard');
 let score = require('./score');
 const { Socket } = require('socket.io');
+const applyColor = require('./applyColor');
 
 
 // hashmap to keep track of the role of the player
@@ -72,8 +73,9 @@ io.on("connection", (socket) => {
     if(!playerRole.isEmpty()){
         io.emit('getAvailableRole', {playerRole: playerRole.availableRole});
     }else{
-        console.log('Role is undefined ' + playerRole.availableRole());
-    }
+        console.log(applyColor.red, 'Role is undefined ' + playerRole.availableRole());
+        console.log(applyColor.resetColor);
+    };
 
     // 1: Assign player's role
     socket.emit('userRole', role);

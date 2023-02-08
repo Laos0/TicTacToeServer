@@ -17,18 +17,23 @@ let boardGame = require('./gameBoard');
 let score = require('./score');
 const { Socket } = require('socket.io');
 const applyColor = require('./applyColor');
+const timer = require('./countDown');
+const switchP = require('./switchPlayer');
 
 
 // hashmap to keep track of the role of the player
 let playersHashMap = new Map();
 
-// hashmap to keep track of player's flashing letter
-let playersAnimation = new Map();
-
 let currentPlayer = 'X';
 let numOfClients = 0;
 let maxCapacity = 4; // a total of only 4 clients
 
+// variable flags for timer control
+let hasTimerStart = false;
+let isTimerUp = false;
+
+// the player socket
+let soc = null;
 
 
 // get request to show that the server is running
@@ -43,11 +48,14 @@ app.get('/clients', (req, res) => {
 
 console.log("BEFORE IF STATEMENT: " + numOfClients);
 
+
 // when a user connects to socket on client side, this will trigger
 io.on("connection", (socket) => {
     // increase the number of clients on the server
     numOfClients++;
 
+    // set socket, so we can use it in another file
+    soc = socket;
 
     // testing purposes
     console.log('User: ' + socket.id + ' connected');
@@ -67,6 +75,7 @@ io.on("connection", (socket) => {
 
     // get the updated board for spectators when they join
     socket.emit('updatedBoard', {boardGame: boardGame.getGameBoard(), xScore: score.getXScore(), oScore: score.getOScore()});
+    socket.emit('getCurPlayer', {curPlayer: currentPlayer});
 
     // emit an available role such as X or O to all clients
     // this is needed to assign role to new clients when player X or O disconnects
@@ -80,6 +89,15 @@ io.on("connection", (socket) => {
     // 1: Assign player's role
     socket.emit('userRole', role);
 
+    // TODO: start the timer if hasTimerStart === false and player X is connected, 
+    // doing this will make it run once regardless of how many socket connects
+    // TODO: possible issue: 
+    if(!timer.getHasTimerStarted() && role === 'X'){
+        //console.log('Server.js the io is', io);
+        // start the timer and the socket of this player
+        startTimerToChangePlayers(io, socket, currentPlayer);
+    }
+
     // 2: Store the user's detail in playersHashMap
     playersHashMap.set(socket.id, role);
 
@@ -92,6 +110,19 @@ io.on("connection", (socket) => {
 
             boardGame.insertIntoBoard(player, row, col);
             console.log(boardGame.printBoard());
+            // TODO: When player successfully selects a tile before timer ends
+            if(timer.getIsTimerUp() === false){
+                // stop the countdown
+                timer.stopCountdown();
+
+                // reset the count
+                timer.resetCount();
+
+                if(boardGame.getIsGameOver() === false){
+                    // start the timer for next player
+                    startTimerToChangePlayers(io, socket, currentPlayer);
+                }
+            }
 
         
             //console.log('Was selection successful? ' + boardGame.getIsSucessfulSelect());
@@ -173,10 +204,44 @@ io.on("connection", (socket) => {
         numOfClients--;
 
         console.log(applyColor.yellow, " the available roles after disconnect: ", playerRole.availableRole());
+        console.log(applyColor.resetColor);
 
     });
 
 });
+
+// ---------------- Functions ------------------------------
+
+// TODO: There is a flaw where, if player X or O selected a tile before the timer ends, the player who justed selected
+// will go again.  We need to Reset the timer, or recall the function
+
+// Some tips for solution: We need a flag, move hasTImerStart around
+function startTimerToChangePlayers(io, socket, cp) {
+
+    // if the game is not over
+    if(!boardGame.getIsGameOver()){
+
+        
+        // flag it to prevent this function being executed multiple times
+        timer.setHasTimerStarted(true);
+        
+        // when the timer reaches 0, and is resolved
+        timer.startCountdown().then(() => {
+            // switch player
+            switchP.switchPlayers(io, socket, cp);
+            currentPlayer = switchP.getNextPlayer(); 
+            timer.resetCount();
+            if(!boardGame.getIsGameOver()){
+                console.log(applyColor.green, "The current player is: ", cp);
+                console.log(applyColor.resetColor);
+
+                startTimerToChangePlayers(io, socket, currentPlayer);
+            }
+        });
+        console.log('Starting the timer... and it is: ', cp + ' turn.');
+        
+    }
+}
 
 
 io.listen(port); // port 3000

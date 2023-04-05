@@ -28,12 +28,15 @@ let currentPlayer = 'X';
 let numOfClients = 0;
 let maxCapacity = 4; // a total of only 4 clients
 
+// store nextSocket
+
 // variable flags for timer control
 let hasTimerStart = false;
 let isTimerUp = false;
 
 // the player socket
 let soc = null;
+
 
 
 // get request to show that the server is running
@@ -110,6 +113,7 @@ io.on("connection", (socket) => {
 
             boardGame.insertIntoBoard(player, row, col);
             console.log(boardGame.printBoard());
+
             // TODO: When player successfully selects a tile before timer ends
             if(timer.getIsTimerUp() === false){
                 // stop the countdown
@@ -117,6 +121,9 @@ io.on("connection", (socket) => {
 
                 // reset the count
                 timer.resetCount();
+                
+                // TODO: Need to alert client side to reset their countdown/timer
+                io.emit('resetTimer', true);
 
                 if(boardGame.getIsGameOver() === false){
                     // start the timer for next player
@@ -167,6 +174,9 @@ io.on("connection", (socket) => {
                     console.log("The winning tiles: " + boardGame.getWinningTiles());
             
                     console.log("THE WINNER IS: " + boardGame.getWinner());
+
+                    // TODO: Start the timer
+                    //startTimerToChangePlayers(io, socket, currentPlayer);
                 }
 
             }else{
@@ -212,33 +222,50 @@ io.on("connection", (socket) => {
 
 // ---------------- Functions ------------------------------
 
-// TODO: There is a flaw where, if player X or O selected a tile before the timer ends, the player who justed selected
-// will go again.  We need to Reset the timer, or recall the function
 
-// Some tips for solution: We need a flag, move hasTImerStart around
+// This function starts the timer
 function startTimerToChangePlayers(io, socket, cp) {
 
     // if the game is not over
     if(!boardGame.getIsGameOver()){
 
-        
-        // flag it to prevent this function being executed multiple times
+        // flag it to prevent this timer from being executed multiple times
         timer.setHasTimerStarted(true);
+
+        // send updates to the client side of the countdown every second
+        setInterval(() => {
+            if(!boardGame.getIsGameOver()){
+                io.emit('getCountDown', timer.getCurrentCountDown());
+            }
+        }, 1000);
         
-        // when the timer reaches 0, and is resolved
+        // TODO: When the timer reaches 0 and the player doesnt do anything, we need to do something
+        // when the timer reaches 0, and is resolved which is the then() method
         timer.startCountdown().then(() => {
-            // switch player
+            
+            // switch player, this will also update the client currentPlayer as well
             switchP.switchPlayers(io, socket, cp);
+
+            // TODO: ISSUE: Not able to select tile
+            // EXAMPLE: X does not go, timer runs out, it is O turns, O cannot select tile
+            // TODO: ISSUE: O will continue to flash after his turn is up, but X is good and will not flash when his turn is up
             currentPlayer = switchP.getNextPlayer(); 
+
+            console.log(applyColor.yellow, "The current player after the switch", currentPlayer);
+            console.log(applyColor.resetColor);
+            // TODO: set the socket
+
             timer.resetCount();
             if(!boardGame.getIsGameOver()){
                 console.log(applyColor.green, "The current player is: ", cp);
                 console.log(applyColor.resetColor);
 
+                // TODO: ISSUE: We dont want to pass in X Socket, we need the O Socket
                 startTimerToChangePlayers(io, socket, currentPlayer);
             }
         });
         console.log('Starting the timer... and it is: ', cp + ' turn.');
+        
         
     }
 }

@@ -19,7 +19,7 @@ function switchPlayers(io, socket, currentPlayer){
         currentPlayer = 'O'
 
         // TODO: target currentPlayer to pass to server side
-        nextPlayer = '0';
+        nextPlayer = 'O';
 
         // turn on the cyurrent player's animation
         io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});

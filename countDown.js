@@ -48,6 +48,11 @@ function getHasTimerStarted(){
   return hasTimerStarted;
 } 
 
+function getCurrentCountDown(){
+  return count;
+}
 
 
-module.exports = {startCountdown, stopCountdown, resetCount, setIsTimerUp, getIsTimerUp, setHasTimerStarted, getHasTimerStarted}
+
+module.exports = {startCountdown, stopCountdown, resetCount, setIsTimerUp, 
+  getIsTimerUp, setHasTimerStarted, getHasTimerStarted, getCurrentCountDown}

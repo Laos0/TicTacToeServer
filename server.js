@@ -49,7 +49,7 @@ app.get('/clients', (req, res) => {
     res.send("There are " + numOfClients + " connected to the server");
 });
 
-console.log("BEFORE IF STATEMENT: " + numOfClients);
+// console.log("BEFORE IF STATEMENT: " + numOfClients);
 
 
 // when a user connects to socket on client side, this will trigger
@@ -61,8 +61,8 @@ io.on("connection", (socket) => {
     soc = socket;
 
     // testing purposes
-    console.log('User: ' + socket.id + ' connected');
-    console.log(" The number of clients connected: " + numOfClients);
+    //console.log('User: ' + socket.id + ' connected');
+    //console.log(" The number of clients connected: " + numOfClients);
 
     // Send the current number of clients to client-side
     socket.emit('getClientCount', numOfClients);
@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
 
     // assigning the role to the player connected
     let role = playerRole.assignRole();
-    console.log('role: ' + role)
+    //console.log('role: ' + role)
 
     // get the updated board for spectators when they join
     socket.emit('updatedBoard', {boardGame: boardGame.getGameBoard(), xScore: score.getXScore(), oScore: score.getOScore()});
@@ -85,8 +85,8 @@ io.on("connection", (socket) => {
     if(!playerRole.isEmpty()){
         io.emit('getAvailableRole', {playerRole: playerRole.availableRole});
     }else{
-        console.log(applyColor.red, 'Role is undefined ' + playerRole.availableRole());
-        console.log(applyColor.resetColor);
+        //console.log(applyColor.red, 'Role is undefined ' + playerRole.availableRole());
+        //console.log(applyColor.resetColor);
     };
 
     // 1: Assign player's role
@@ -98,7 +98,7 @@ io.on("connection", (socket) => {
     if(!timer.getHasTimerStarted() && role === 'X'){
         //console.log('Server.js the io is', io);
         // start the timer and the socket of this player
-        startTimerToChangePlayers(io, socket, currentPlayer);
+        startTimerToChangePlayers(io, socket);
     }
 
     // 2: Store the user's detail in playersHashMap
@@ -112,26 +112,30 @@ io.on("connection", (socket) => {
             //console.log(player + ' selected ' + row + ', ' + col);
 
             boardGame.insertIntoBoard(player, row, col);
-            console.log(boardGame.printBoard());
+            //console.log(boardGame.printBoard());
 
-            // TODO: When player successfully selects a tile before timer ends
+            // When player successfully selects a tile before timer ends
             if(timer.getIsTimerUp() === false){
                 // stop the countdown
                 timer.stopCountdown();
 
                 // reset the count
                 timer.resetCount();
+
+                // TODO: ----------------------------------
+                // Something to do with switching players when a player selects before timer ends
+                //switchP.switchPlayers(io, socket, currentPlayer);
                 
-                // TODO: Need to alert client side to reset their countdown/timer
-                io.emit('resetTimer', true);
+
+                // END OF TODO: ---------------------------
 
                 if(boardGame.getIsGameOver() === false){
                     // start the timer for next player
-                    startTimerToChangePlayers(io, socket, currentPlayer);
+                    startTimerToChangePlayers(io, socket);
                 }
+
             }
 
-        
             //console.log('Was selection successful? ' + boardGame.getIsSucessfulSelect());
             // if the selection was successful
             if(boardGame.getIsSucessfulSelect()){
@@ -147,16 +151,24 @@ io.on("connection", (socket) => {
                 // proceed to switch players only if game is not over
                 if(!boardGame.getIsGameOver()){
 
-                    // change to next player
-                    if(currentPlayer == 'X'){
-                        currentPlayer = 'O';
-                        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
-                    }else{
-                        currentPlayer = 'X';
-                        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
-                    }
+                    // // change to next player
+                    // if(currentPlayer == 'X'){
+                    //     currentPlayer = 'O';
+                    //     io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
+                    // }else{
+                    //     currentPlayer = 'X';
+                    //     io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
+                    // }
+                    
+                    console.log('SWITCH PLAYERS on SELECT..the current player: ', currentPlayer);
+
+                    // TODO: SWITCH PLAYER HERE 
+                    currentPlayer = switchP.switchPlayers(io, socket, currentPlayer);
+                    //currentPlayer = 'O';
+
                 }else{ // if the game is over and a winner is declared
 
+                    console.log('GAME OVER');
                     // change to next player
                     if(currentPlayer == 'X'){
                         currentPlayer = 'O';
@@ -165,18 +177,23 @@ io.on("connection", (socket) => {
                         currentPlayer = 'X';
                         io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
                     }
+
 
                     // increment score for the winner or do nothing if there is atie
                     score.incrementScore(boardGame.getWinner());
 
                     io.emit('gameOver', {message: 'The game is over', isGameOver: boardGame.getIsGameOver(), winner: boardGame.getWinner(), winTiles: boardGame.getWinningTiles(), curPlayer: currentPlayer, playerXScore: score.getXScore(), playerOScore: score.getOScore()});
 
-                    console.log("The winning tiles: " + boardGame.getWinningTiles());
+                    //console.log("The winning tiles: " + boardGame.getWinningTiles());
             
-                    console.log("THE WINNER IS: " + boardGame.getWinner());
+                    //console.log("THE WINNER IS: " + boardGame.getWinner());
 
+                    boardGame.resetGameOver();
                     // TODO: Start the timer
-                    //startTimerToChangePlayers(io, socket, currentPlayer);
+                    setTimeout(function() {
+                        startTimerToChangePlayers(io, socket);
+                      }, 2000); // 1000 milliseconds = 1 second
+                  
                 }
 
             }else{
@@ -198,7 +215,7 @@ io.on("connection", (socket) => {
             boardGame.clearWinTiles();
             console.log("The current player after restarting is: ", currentPlayer);
             console.log('The boolean for gameOver is: ' + boardGame.getIsGameOver());
-            console.log(boardGame.getGameBoard());
+            //console.log(boardGame.getGameBoard());
             // emit to client once everything has been resetted so client side knows when to refresh webpage
             io.emit('restartComplete', {gameBoard: boardGame.getGameBoard(), curPlayer: currentPlayer});
         }
@@ -213,8 +230,8 @@ io.on("connection", (socket) => {
         // when a user disconnects we subtract
         numOfClients--;
 
-        console.log(applyColor.yellow, " the available roles after disconnect: ", playerRole.availableRole());
-        console.log(applyColor.resetColor);
+        //console.log(applyColor.yellow, " the available roles after disconnect: ", playerRole.availableRole());
+        //console.log(applyColor.resetColor);
 
     });
 
@@ -224,11 +241,11 @@ io.on("connection", (socket) => {
 
 
 // This function starts the timer
-function startTimerToChangePlayers(io, socket, cp) {
+function startTimerToChangePlayers(io, socket) {
 
     // if the game is not over
     if(!boardGame.getIsGameOver()){
-
+        console.log('STARTING NEW TIMER...');
         // flag it to prevent this timer from being executed multiple times
         timer.setHasTimerStarted(true);
 
@@ -243,29 +260,31 @@ function startTimerToChangePlayers(io, socket, cp) {
         // when the timer reaches 0, and is resolved which is the then() method
         timer.startCountdown().then(() => {
             
-            // switch player, this will also update the client currentPlayer as well
-            switchP.switchPlayers(io, socket, cp);
+            console.log(applyColor.red, "CountDown finished, CP: ", currentPlayer);
+            console.log(applyColor.resetColor);
 
-            // TODO: ISSUE: Not able to select tile
-            // EXAMPLE: X does not go, timer runs out, it is O turns, O cannot select tile
-            // TODO: ISSUE: O will continue to flash after his turn is up, but X is good and will not flash when his turn is up
-            currentPlayer = switchP.getNextPlayer(); 
+            // setting the currentPlayer
+            // switch player, this will also update the client currentPlayer as well
+
+            currentPlayer = switchP.switchPlayers(io, socket, currentPlayer);
+
+            // when it is a player's turn we need to reset the timer for their countdown
+            // so it doesnt go negative
+            timer.resetCount();
 
             console.log(applyColor.yellow, "The current player after the switch", currentPlayer);
             console.log(applyColor.resetColor);
-            // TODO: set the socket
 
-            timer.resetCount();
             if(!boardGame.getIsGameOver()){
-                console.log(applyColor.green, "The current player is: ", cp);
+                console.log(applyColor.green, "The current player is: ", currentPlayer);
                 console.log(applyColor.resetColor);
 
                 // TODO: ISSUE: We dont want to pass in X Socket, we need the O Socket
-                startTimerToChangePlayers(io, socket, currentPlayer);
+                startTimerToChangePlayers(io, socket);
             }
         });
-        console.log('Starting the timer... and it is: ', cp + ' turn.');
-        
+
+        //console.log('Starting the timer... and it is: ', cp + ' turn.');
         
     }
 }

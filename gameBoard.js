@@ -135,6 +135,7 @@ function getWinner(){
 
 function resetGameOver(){
     isGameOver = false;
+    isTie = false;
 }
 
 function setIsTie(trueOrFalse){

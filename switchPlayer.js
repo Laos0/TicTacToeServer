@@ -8,48 +8,56 @@ function test(){
     console.log(timer);
 }
 
-function switchPlayers(io, socket, currentPlayer){
+function switchPlayers(io, socket, cp){
+
 
     //  we check who the current player is and switch it 
-    if(currentPlayer === 'X'){
+    if(cp === 'X'){
+
+        console.log('Changing to O...................');
+
         // turn off the current player's animation
         socket.emit('animationOff', false);
 
         // switch player
-        currentPlayer = 'O'
+        // currentPlayer = 'O'
 
         // TODO: target currentPlayer to pass to server side
         nextPlayer = 'O';
 
-        // turn on the cyurrent player's animation
-        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
+        // turn on the current player's animation
+        io.emit('animationOn', {turnAnimationOn: true, curPlayer: nextPlayer});
 
         // once current player is switched, we need to emit 
-        io.emit('playerChanged', {curPlayer: currentPlayer});
-
-        // flagging timer so its okay to run this method again
-        // timer.setHasTimerStarted(false); 
-
+        io.emit('playerChanged', {curPlayer: nextPlayer});
+       
       
     }else{
+
+        console.log('Changing to X...................');
+
         // turn off the current player's animation
         socket.emit('animationOff', false);
 
         // switch player
-        currentPlayer = 'X';
+        // currentPlayer = 'X';
 
         // TODO: target currentPlayer to pass to server side
         nextPlayer = 'X';
+        
 
-        // turn on the cyurrent player's animation
-        io.emit('animationOn', {turnAnimationOn: true, curPlayer: currentPlayer});
+        // turn on the current player's animation
+        io.emit('animationOn', {turnAnimationOn: true, curPlayer: nextPlayer});
 
-        // once current player is switched, we need to emit 
-        io.emit('playerChanged', {curPlayer: currentPlayer});
+        // once current player is switched, we need to emit and update client-side's current player
+        io.emit('playerChanged', {curPlayer: nextPlayer});
 
         // flagging timer so its okay to run this method again
         //hasTimerStart = false; 
+     
     }
+
+   return nextPlayer;
 
 }
 
@@ -57,4 +65,8 @@ function getNextPlayer(){
     return nextPlayer;
 }
 
-module.exports = {test, switchPlayers, getNextPlayer};
+function setNextPlayer(player){
+    nextPlayer = player;
+}
+
+module.exports = {test, switchPlayers, getNextPlayer, setNextPlayer};

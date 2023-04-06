@@ -14,7 +14,7 @@ function startCountdown() {
   
     intervalId = setInterval(() => {
       count--;
-      console.log(count);
+      //console.log(count);
       if (count === 0) {
         setIsTimerUp(true);
         clearInterval(intervalId);
@@ -30,6 +30,8 @@ function stopCountdown() {
 
 function resetCount(){
   count = 10;
+  isTimerUp = false;
+  hasTimerStarted = false;
 }
 
 function setIsTimerUp(trueOrFalse){

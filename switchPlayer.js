@@ -10,19 +10,15 @@ function test(){
 
 function switchPlayers(io, socket, cp){
 
-
     //  we check who the current player is and switch it 
     if(cp === 'X'){
 
         console.log('Changing to O...................');
 
         // turn off the current player's animation
-        socket.emit('animationOff', false);
+        io.emit('animationOff', false);
 
-        // switch player
-        // currentPlayer = 'O'
-
-        // TODO: target currentPlayer to pass to server side
+        // the next player to go
         nextPlayer = 'O';
 
         // turn on the current player's animation
@@ -37,7 +33,7 @@ function switchPlayers(io, socket, cp){
         console.log('Changing to X...................');
 
         // turn off the current player's animation
-        socket.emit('animationOff', false);
+        io.emit('animationOff', false);
 
         // switch player
         // currentPlayer = 'X';
